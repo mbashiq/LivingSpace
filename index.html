@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Living Spaces</title>
+<!--	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Raleway:400,500,700,800" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">-->
+	<link rel="stylesheet" href="css/style.css?1" />
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="js/firebase.js" type="text/javascript"></script>
+	<script src="js/jquery.ui.js" type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+	
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyAbNXWGThmbqVkLKNe6dwQaMu0pcufuLw8",
+	    authDomain: "living-space-f1e06.firebaseapp.com",
+	    databaseURL: "https://living-space-f1e06.firebaseio.com",
+	    projectId: "living-space-f1e06",
+	  };
+	  firebase.initializeApp(config);
+	</script>
+</head>
+
+<body>
+
+	<div id="loading">
+		
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+		  <defs>
+		    <filter id="gooey">
+		      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"></feGaussianBlur>
+		      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"></feColorMatrix>
+		      <feBlend in="SourceGraphic" in2="goo"></feBlend>
+		    </filter>
+		  </defs>
+		</svg>
+		<div class="blob blob-0"></div>
+		<div class="blob blob-1"></div>
+		<div class="blob blob-2"></div>
+		<div class="blob blob-3"></div>
+		<div class="blob blob-4"></div>
+		<div class="blob blob-5"></div>
+	</div>
+	
+	<div id="main_body">
+		<div class="sidebar">
+			<h2>Living Spaces</h2>
+			<img class="line" src="images/line.png" />
+			<div class="input_holder">
+				<input type="checkbox" id="filter_school" /><label for="filter_school">School</label><br />
+				<input type="checkbox" id="filter_bus_station" /><label for="filter_bus_station">Public Transport</label><br />
+				<input type="checkbox" id="filter_atm" /><label for="filter_atm">ATM</label><br />
+				<input type="checkbox" id="filter_hospital" /><label for="filter_hospital">Hospital</label><br />
+				<input type="checkbox" id="filter_police" /><label for="filter_police">Police</label><br />
+				<button onclick="sendFilter()">Search</button>
+			</div>
+		</div>
+		<div id="map"></div>
+		<input type="text" name="pac-input" id="pac-input" class="custom_input"/>
+	</div>
+	<div class="overlay" onclick="closeModal()"></div>
+	
+	<div id="modal">
+			
+	    <div class="modal_header">
+	    	<div class="overlay" style="opacity: 0.3;"></div>
+	    	<h2 id="place_name"></span></h2>
+	    </div>
+	    <div class="card_holder">
+	    	<div class="card" id="weather">
+	    		<img class="card_icon" src="images/wind.png"/>
+	    		<p style="text-transform: capitalize;padding: 0px 8px;font-weight: 600;"></p>
+	    	</div>
+	    	<div class="card" id="temp">
+	    		<img class="card_icon" src="images/sun.png"/>
+	    		<p>Temp</p>
+	    		<h4 class="card_value">--</h4>
+	    	</div>
+	    	<div class="card" id="wind">
+	    		<img class="card_icon" src="images/wind.png"/>
+	    		<p>Wind</p>
+	    		<h4 class="card_value">--</h4>
+	    	</div>
+	    	<div class="card" id="humidity">
+	    		<img class="card_icon" src="images/humidity.png" style="width: 40px;margin: 20px 30px 15px 30px;;"/>
+	    		<p>Humidity</p>
+	    		<h4 class="card_value">--</h4>
+	    	</div>
+	    </div>
+	    
+	    <div class="card_holder">
+	    	<div class="card wide_card" id="air_pollution">
+	    		<img class="card_icon" src="images/air_quality.png"/>
+	    		<p>Air <br />Quality</p>
+	    		<h4 class="card_value"><li id="sugg1"></li>
+	    		<li id="sugg2"></li></h4>
+	    	</div>
+	    </div>
+	    
+	    <div class="card_holder">
+	    	<div class="card wide_card" id="custom_data">
+	    		<img class="card_icon" src="images/custom_data.png"/>
+	    		<p>Local Weather <br />Station</p>
+	    		<h4 class="card_value"><li id="sugg3">33° C | 61%</li>
+	    		<li id="sugg4">0.65 mg/m3 | 5 UV Index</li></h4>
+	    	</div>
+	    </div>
+	    
+	    <div class="card_holder">
+	    	<div class="info_card" id="insert_review">
+	    		<div class="img_holder" id="atm">
+	    			<div class="circle_img" style="background-image: url(images/atm.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="bus_station">
+	    			<div class="circle_img" style="background-image: url(images/bus.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="school">
+	    			<div class="circle_img" style="background-image: url(images/student.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="hospital">
+	    			<div class="circle_img" style="background-image: url(images/hospital.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="police">
+	    			<div class="circle_img" style="background-image: url(images/police.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="gas_station">
+	    			<div class="circle_img" style="background-image: url(images/gas.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="train_station">
+	    			<div class="circle_img" style="background-image: url(images/railway.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		<div class="img_holder" id="airport">
+	    			<div class="circle_img" style="background-image: url(images/airport.png);"></div>
+	    			<p>--</p>
+	    		</div>
+	    		    	    		
+	    		<button id="write_review" onclick="review()">Review this location</button>
+	    		
+	    		<div class="login-form">
+	    		        
+	    		        <div class="login-top">
+	    		                <input id="sign-in" name="Sign-in" value="Facebook SignIn" onclick="facebook()"/>
+	    		                <input id="sign-in" name="Sign-in" value="Google SignIn" onclick="google()"/>
+	    		        </div>
+	    		        
+	    		        <div class="login-bottom">
+	    		        </div>
+	    		        
+	    		    </div>
+	    		
+	    		
+	    	</div>
+	    </div>
+	</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLoPvwdh7kgPmBtG5ZPTYSjqiMErOy0KU&libraries=places&callback=initMap" async defer></script>
+</body>
+</html>
